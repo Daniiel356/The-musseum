@@ -21,11 +21,17 @@ window.initTutorial=async ()=>{
     setScene(scenes.LOAD_SCREEN);
     await initTutorial();
     setScene(scenes.MENU);
-}
+};
 
 window.initMultiplayer=async ()=>{
     setScene(scenes.LOAD_SCREEN)
     await game.initMultiPlayer();
-}
+};
+
+window.addEventListener("wheel", (e)=>{
+    if(e.ctrlKey){
+        e.preventDefault();
+    }
+}, {passive: false});
 
 await setScene(scenes.MENU);
