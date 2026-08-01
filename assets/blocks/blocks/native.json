@@ -1,0 +1,20 @@
+[
+    {
+        "name":"entitySpawn",
+        "logic":{
+            "solid":false,
+            "x":0, "y":0,
+            "w":0, "h":0,
+            "execute":[
+                {
+                    "command": "spawn /e{entity}",
+                    "once": "/e{once}",
+                    "every": "/e{timing}"
+                }
+            ]
+        },
+        "style":{
+            "bg":"rgba(0,0,0,0)"
+        }
+    }
+]

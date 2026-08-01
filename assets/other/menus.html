@@ -1,0 +1,117 @@
+<template id="main">
+    <button class="btn1" style="top:50%" onclick="setScene(scenes.PLAY_MENU)">Jugar</button>
+    <button class="btn1" style="top:65%" onclick="(async()=>{await initTutorial();})()">Tutorial</button>
+</template>
+
+<template id="initialPlay">
+    <button class="btnBack" onclick="setScene(scenes.MENU)"></button>
+    <button class="btn1" style="top:50%" onclick="(async()=>{await initMultiplayer()})()">Multijugador</button>
+</template>
+
+<template id="loadSetting">
+    <p id="load">Cargando<span id="x"></span></p>
+    <p id="loadData" style="top:10%"></p>
+    <script>
+        window.isLoading=true;
+        document.body.style.background="#000";
+        let p=0;
+        const x=document.getElementById("x");
+        const interv=()=>{
+            if(!x)return;
+            p=p<3?p+1:0;
+            x.textContent=".".repeat(p);
+            setTimeout(()=>interv(), 650)
+        }
+        setTimeout(()=>interv(), 650);
+    </script>
+</template>
+<template id="game">
+    <div id="touchpad"></div>
+    <div id="joy">
+        <div id="stick"></div>
+    </div>
+
+    <div id="rightbar">
+        <div class="slot"></div>
+        <div class="slot"></div>
+        <div class="slot"></div>
+    </div>
+
+    <script> 
+        const touchpad=document.getElementById("touchpad");
+        const joy=document.getElementById("joy");
+        const stick=document.getElementById("stick");
+        const rightbar=document.getElementById("rightbar");
+
+        let rect=joy.getBoundingClientRect();
+        let joyX=rect.left + rect.width/2;
+        let joyY=rect.top + rect.height/2;
+        let r=rect.width/2;
+
+        let touchId=-1;
+
+        function move(e){
+            if(e.pointerId!=touchId)return;
+            const x=e.pageX;
+            const y=e.pageY;
+
+            let dx=x-joyX;
+            let dy=y-joyY;
+
+            const dist=Math.hypot(dx, dy);
+
+            if(dist>r){
+                dx=dx/dist*r;
+                dy=dy/dist*r;
+            }
+            window.game.engine.input={
+                x: dx<0? -0.4+Math.min(-0.6, dx/r): 0.4+Math.max(0.6, dx/r),
+                y: dy<0? -0.4+Math.min(-0.6, dy/r): 0.4+Math.max(0.6, dy/r)
+            };
+            stick.style.transform =`translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
+        }
+        function end(e){
+            if(touchId==-1||e.pointerId!=touchId)return;
+            try {
+                e.target.releasePointerCapture(e.pointerId);
+            } catch(err) {}
+
+            window.game.engine.input={x:0, y:0};
+            stick.style.transform =`translate(-50%, -50%)`;
+            touchId=-1;
+        }
+
+        function start(e){
+            touchId=e.pointerId;
+            e.target.setPointerCapture(e.pointerId);
+        }
+
+        let focusSlot=-1;
+
+        for(let i=0; i<rightbar.children.length; i++){
+            const elem=rightbar.children[i];
+            elem.addEventListener("pointerdown", ()=>{
+                if(focusSlot==i)focusSlot=-1;
+                else focusSlot=i;
+
+                for(let i=0; i<rightbar.children.length; i++){
+                    const slot=rightbar.children[i];
+                    if(i==focusSlot)slot.dataset.focused="1";
+                    else  slot.dataset.focused="0";
+                }
+            });
+        }
+
+        joy.addEventListener("pointerdown", start);
+        document.addEventListener("pointermove", move);
+        document.addEventListener("pointerup", end);
+
+        window.addEventListener("resize", ()=>{
+            rect=joy.getBoundingClientRect();
+            joyX=rect.left + rect.width/2;
+            joyY=rect.top + rect.height/2;
+            r=rect.width/2;
+        })
+
+    </script>
+</template>

@@ -1,0 +1,14 @@
+[
+    {
+        "name":"floor1",
+        "style":{
+            "bg":"#000"
+        }
+    },
+    {
+        "name":"floor2",
+        "style":{
+            "bg":"#fff"
+        }
+    }
+]

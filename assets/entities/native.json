@@ -1,0 +1,12 @@
+[
+    {
+        "name": "tuto_player",
+        "style":{ "bg":"#f00" },
+        "logic":{
+            "w":80, "h":100,
+            "v": 5
+        },
+        "type":"player",
+        "habilities":[]
+    }
+]

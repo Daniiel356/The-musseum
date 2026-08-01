@@ -1,0 +1,85 @@
+html, body, #ui{
+    position: absolute;
+    width: 100%; height: 100%;
+    padding: 0; margin: 0;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+canvas{
+    padding: 0; margin: 0;
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.btnBack{
+    position: absolute;
+    left: 2vh; bottom: 2vh;
+    width: 20vh; height: 10vh;
+    border: solid black 1px;
+}
+
+#load, #loadData{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: x-large;
+}
+/*Play Menu*/
+.btn1{
+    position: absolute;
+    width: 30%; height: 12%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+/*GAME*/
+#touchpad{
+    position: absolute;
+    width: 50%; height: 100%;
+    background: rgba(0,0,255,0.1);
+}
+#joy{
+    position: absolute;
+    left: 30vh; top: 70vh;
+    transform: translateX(-50%) translateY(-50%);
+    height: 40vh; width: 40vh;;
+    border-radius: 50%; border: solid rgba(255,255,255,0.2) 2px;
+    background: rgba(20,20,20,0.65);
+}
+#stick{
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    width: 25vh; height: 25vh;
+    border-radius: 50%; border: solid rgba(255, 255, 255, 0.2) 2px;
+    background: rgba(0,0,0, 0.8);
+}
+
+#rightbar{
+    position: absolute;
+    left: calc(99vw - 25vh); top: 12.5vh;
+    width: 25vh; height: 75vh;
+    background: rgba(20,20,20,0.75);
+    border: solid rgba(255, 255, 255, 0.25) 2px;
+    border-radius: 5px;
+    box-sizing: border-box; padding: 1.5vh;
+    display: grid; gap: 3vh;
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.slot{
+    width: 100%; height: 100%;
+    background: rgba(20,20,20,0.8);
+    border: solid rgba(255,255,255,0.25) 2px;
+    border-radius: 5px; box-sizing: border-box;
+    &[data-focused = "1"]{
+        border-color: #fff;
+    }
+    &[data-hover = "true"]{
+        background: beige;
+    }
+}
