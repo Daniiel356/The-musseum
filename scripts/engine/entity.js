@@ -7,8 +7,9 @@ export class Entity{
     input={};
     type="solid";
     style={
-        bg:"#000"
+        bg:"0,0,0"
     };
+    tags={};
 
     constructor(data, id){
         this.id=id;
@@ -31,7 +32,7 @@ export async function parserEntities(rawEntitiesSource){
         
         const entitiesImport=entities.import;
         for(const identifier of Object.keys(entitiesImport)){
-            const newEntity={name: identifier, style: {bg:"#000"}, logic:{w:0,h:0}, habilities:[]};
+            const newEntity={name: identifier, style: {bg:"0,0,0"}, logic:{w:0,h:0}, habilities:[]};
 
             const index=entitiesBase.findIndex((e)=>e.name==entitiesImport[identifier]);
             if(index!==-1){

@@ -1,7 +1,7 @@
 [
     {
         "name": "tuto_player",
-        "style":{ "bg":"#f00" },
+        "style":{ "bg":"255,0,0" },
         "logic":{
             "w":80, "h":100,
             "v": 5

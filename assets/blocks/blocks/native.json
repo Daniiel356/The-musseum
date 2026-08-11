@@ -1,20 +1,13 @@
 [
     {
-        "name":"entitySpawn",
+        "name":"playerSpawn",
         "logic":{
             "solid":false,
             "x":0, "y":0,
-            "w":0, "h":0,
-            "execute":[
-                {
-                    "command": "spawn /e{entity}",
-                    "once": "/e{once}",
-                    "every": "/e{timing}"
-                }
-            ]
+            "w":0, "h":0
         },
         "style":{
-            "bg":"rgba(0,0,0,0)"
+            "bg":"0,0,0,0"
         }
     }
 ]

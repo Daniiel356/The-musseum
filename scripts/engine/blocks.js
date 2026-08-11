@@ -25,7 +25,6 @@ export async function parserBlocks(rawBlocksSource){
 
             Blocks.push(newBlock);
             console.log(`Bloque ${identifier} cargado desde ${blocksGroup.src}/${src}`);
-            
         }
     }
 

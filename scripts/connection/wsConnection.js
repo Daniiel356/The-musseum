@@ -1,16 +1,34 @@
 export class Conn {
-    #ws=new WebSocket("wss://testserver-h5lx.onrender.com");
+    #ws;
+    out=()=>{};
+    get state(){return this.#ws?.readyState || -1};
 
-    constructor(){
-        this.#ws.onopen=()=>{
-            console.log("Conectado al Server")
+    async init(){
+        this.#ws=new WebSocket("wss://testserver-h5lx.onrender.com");
+        let resolve=()=>{
+            console.log("Ejem...");
+        };
+        let reject=()=>{
+            console.error("Error de conexion");
         }
+
+        this.#ws.onopen=()=>{
+            resolve();
+        };
 
         this.#ws.onmessage=(msg)=>{
-            const data=JSON.parse(msg.data);
-            if(data.id)console.log("id:", data.id);
-            if(data.host)console.log("Eres host");
+            this.out(msg);
+        };
 
-        }
+        this.#ws.onerror=(err)=>{
+            reject(err);
+        };
+        return new Promise((res, rej)=>{
+            resolve=res;
+            reject=rej;
+        });
+    }
+    send(msg){
+        this.#ws.send(msg);
     }
 }

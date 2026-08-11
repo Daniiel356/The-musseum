@@ -34,4 +34,27 @@ window.addEventListener("wheel", (e)=>{
     }
 }, {passive: false});
 
+document.addEventListener("keypress", ()=>{
+    console.log("Modo PC relativamente activado");
+    const keys={};
+    const act=()=>{
+        const input={x:0, y:0};
+        if(keys["KeyW"])input.y-=1;
+        if(keys["KeyA"])input.x-=1;
+        if(keys["KeyS"])input.y+=1;
+        if(keys["KeyD"])input.x+=1;
+
+        window.game.engine.input=input;
+    };
+    document.addEventListener("keydown", (e)=>{
+        console.log(e.code);
+        
+        keys[e.code]=true;
+        act();
+    });
+    document.addEventListener("keyup", (e)=>{
+        keys[e.code]=false;
+        act();
+    });
+}, {once: true});
 await setScene(scenes.MENU);

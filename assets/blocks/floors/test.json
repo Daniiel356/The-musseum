@@ -2,13 +2,13 @@
     {
         "name":"floor1",
         "style":{
-            "bg":"#000"
+            "bg":"0,0,0"
         }
     },
     {
         "name":"floor2",
         "style":{
-            "bg":"#fff"
+            "bg":"255,255,255"
         }
     }
 ]

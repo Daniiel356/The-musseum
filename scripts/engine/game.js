@@ -14,13 +14,23 @@ export class Game{
     get playerId(){ return this.#playerId; }
     #lastTime=-1;
     #count=0;
+    #actControls=()=>{};
 
-    actControls=()=>{};
+    constructor(){
+        this.#conection.on=(event, v)=>{
+            this._isHost=v.host;
+        };
+    }
 
     async init(world){
-        this.#world=new World(await loadWorld(world));
-        await this.#world.init();
+        if(this._isHost){
+            this.#world=new World(await loadWorld(world));
+            await this.#world.init();
+            this.#playerId=await this.#world.spawnPlayer();
+        }
+        this.#render.init();
         this.#render._size=this.#world._size;
+        this.update();
         this.start();
     }
 
@@ -29,16 +39,19 @@ export class Game{
             this.loop=(t)=>{
                 this.#count+=(t-this.#lastTime);
                 this.#lastTime=t;
-                this.actControls();
-                if(this.#count>=this.#world.frec){
+                this.#actControls();
+
+                while(this.#count>=this.#world.frec){
                     this.#world.update();
                     this.#count-=this.#world.frec;
                 }
+
                 this.#render.render();
 
                 requestAnimationFrame((x)=>this.loop(x));
             };
-            this.actControls=()=>{
+
+            this.#actControls=()=>{
                 this.#world.entities.forEach(e=>{
                     if(e.id==this.#playerId)e.input=window.game.engine.input;
                 });
@@ -50,11 +63,21 @@ export class Game{
         this.#render._floor=this.#world.floor;
         this.#render._floorSource=this.#world._floorClass;        
         this.#render._entities=this.#world.entities;
+        this.#render._playerId=this.#playerId;
     }
 
+    simuleHost(){
+        this.#conection._host=true;
+        this._isHost=true;
+    }
     async initMultiPlayer(){
         if(window.isLoading){
-            await this.#conection.connectToServer();
+            try{
+                await this.#conection.connectToServer();
+                console.log("Conectado con exito");
+            }catch(err){
+                console.error("Error al conectar", err);
+            }
         }
     }
 

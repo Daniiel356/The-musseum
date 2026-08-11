@@ -12,8 +12,6 @@ export async function initTutorial(){
 
 async function prepTuto(){
     const fakeGame=new Game();
-    fakeGame._isHost=true;
+    fakeGame.simuleHost();
     await fakeGame.init("test");
-
-    fakeGame.playerId=await fakeGame.world.executeCommand("spawn player 5 5");
 };
