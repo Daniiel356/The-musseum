@@ -1,12 +1,5 @@
-import { Entity, parserEntities } from "./entity.js";
-import { parserBlocks } from "./blocks.js";
-
-async function loadWorld(name){
-    const res=await fetch("./assets/worlds/"+name+".json");
-    if(!res.ok)throw new Error("Error al cargar el mundo "+name);
-
-    return await res.json();
-}
+import { Entity, parserEntities } from "../entity.js";
+import { parserBlocks } from "../blocks.js";
 
 class World{
     frec=1000/50;
@@ -25,6 +18,7 @@ class World{
     entities=[];
     #worldEntities=[];
     _entityClass=[];
+    hitboxes=[];
 
     friction=8;
 
@@ -80,11 +74,11 @@ class World{
 
     playerEvent(event){
         const p=this.entities.find((e)=>e.id==event.id&&e.type=="player");
+        const data=event.data;
         if(event.type="click"){
-            const x=Math.floor((p.x+Math.cos(event.data.ang))/100);
-            const y=Math.floor((p.y+Math.sin(event.data.ang))/100);
-
-            p.x=x*100; p.y=y*100;
+            if(!p.canHit)return;
+            p.special.canHit=false;
+            p.style.bg="0,255,0";
         }
     }
 
@@ -185,4 +179,4 @@ class World{
     }
 }
 
-export {World, loadWorld}
+export {World}

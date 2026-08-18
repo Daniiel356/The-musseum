@@ -10,12 +10,12 @@ export class Entity{
         bg:"0,0,0"
     };
     tags={};
+    special={};
 
     constructor(data, id){
         this.id=id;
-        this.w=data.logic.w;
-        this.h=data.logic.h;
         this.type=data.type||"solid";
+        Object.assign(this, data.logic);
         this.style=data.style;
     }
 

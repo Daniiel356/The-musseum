@@ -1,6 +1,7 @@
 import { Connection } from "../connection/conection.js";
 import { Render } from "../visual/render.js";
-import { World, loadWorld } from "./world.js";
+import { World } from "./world/world.js";
+import { loadWorld } from "./world/utils.js";
 
 export class Game{
     #conection=new Connection();
@@ -9,7 +10,8 @@ export class Game{
     #inloop=false;
     _isHost=false;
     _connectionState=0;//0: desconectado, 1: tratando de conectar, 2: conectado, 3: desconectado (por error)
-    #playerId=-1
+    #playerId=-1;
+    #habilities=[];
     set playerId(v){this.#playerId=v; this.#render._playerId=v; }
     get playerId(){ return this.#playerId; }
     #lastTime=-1;
@@ -28,7 +30,7 @@ export class Game{
             await this.#world.init();
             this.#playerId=await this.#world.spawnPlayer();
         }
-        this.#render.init();
+        await this.#render.init();
         this.#render._size=this.#world._size;
         this.update();
         this.start();
@@ -56,8 +58,9 @@ export class Game{
                     if(e.id==this.#playerId)e.input=window.game.engine.input;
                 });
             };
-            window.game.clickEvent=(x, y)=>this.#clickEvent(x, y);
         }
+        window.game.clickEvent=(x, y)=>this.#clickEvent(x, y);
+        this.#habilities=this.#conection.request("habilities", this.#playerId);
 
         this.#render._blocks=this.#world.cont;
         this.#render._blocksSource=this.#world._blocksClass;
@@ -67,7 +70,7 @@ export class Game{
         this.#render._playerId=this.#playerId;
     }
 
-    simuleHost(){
+    setHost(){
         this.#conection._host=true;
         this._isHost=true;
     }
@@ -98,13 +101,17 @@ export class Game{
 
     #clickEvent(x, y){
         const p=this.#world.entities.find((e)=>e.id==this.#playerId);
-        const cam=this.#render._cam;
-        x*=this.#render.getScaleX(); y*=this.#render.getScaleY();
-        const ang=Math.atan2(
-            (y+cam.y)-(p.y-p.h), (x+cam.x)-(p.x+p.w)
-        );
-        console.log(Math.cos(ang))
-        //this.#world.playerEvent({type: "click", id: this.#playerId, data: {ang, dif}});
+        x=this.#render.screenToWorldX(x); y=this.#render.screenToWorldY(y);
+        const dx=x-(p.x+p.w/2);
+        const dy=y-(p.y+p.h/2);
+
+        this.#world.playerEvent({
+            type: "click", id: this.#playerId, 
+            data: {
+                ang: Math.atan2(dy, dx),
+                dis: Math.sqrt(dx**2+dy**2)
+            }
+        });
     }
 
     get world(){return this.#world};

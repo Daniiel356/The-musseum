@@ -5,9 +5,19 @@
         "logic":{
             "solid":true,
             "w":80, "h":100,
-            "v": 5
+            "v": 5,
+            "healt":100
         },
         "type":"player",
-        "habilities":[]
+        "habilities":[
+            {
+                "name":"hit",
+                "default":true,
+                "execute":"summonHit /id /habilities[0].hit",
+                "hit":{
+                    "damage":10
+                }
+            }
+        ]
     }
 ]

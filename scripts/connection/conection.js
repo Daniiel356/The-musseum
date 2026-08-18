@@ -9,7 +9,6 @@ export class Connection{
     _id=-1;
     on=()=>{};
 
-
     constructor(){
         fetch("https://testserver-h5lx.onrender.com").catch((e)=>{
             console.log("ERROR al conectar")
@@ -31,6 +30,8 @@ export class Connection{
             this.#initReject(err);
         }
     }
+
+    request(){}
 
     #update(){
         this._state=this.#conn.state;

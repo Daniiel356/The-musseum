@@ -12,6 +12,6 @@ export async function initTutorial(){
 
 async function prepTuto(){
     const fakeGame=new Game();
-    fakeGame.simuleHost();
+    fakeGame.setHost();
     await fakeGame.init("test");
 };

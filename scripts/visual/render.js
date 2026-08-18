@@ -41,11 +41,16 @@ export class Render{
         this.#engine.draw();
     }
 
-    getScaleX(){
-        return this._zoom.value*scale.w;
+    screenToWorldX(x){
+        const rect=canvas.getBoundingClientRect();
+        const canvasX=(x-rect.left)*(canvas.width/rect.width);
+        return canvasX/(this._zoom.value*scale.w)+this._cam.x;
     }
-    getScaleY(){
-        return this._zoom.value*scale.h;
+    screenToWorldY(y){
+        const rect=canvas.getBoundingClientRect();
+        const canvasY=(y-rect.top)*(canvas.height/rect.height);
+
+        return canvasY/(this._zoom.value*scale.h)+this._cam.y;
     }
 
     #calcCam(){
@@ -54,13 +59,17 @@ export class Render{
         const p=this._entities.find(e=>e.id==this._playerId);
         if(!p)return;
 
+        const maxX=Math.max(0,this._size.w*100-w);
+        const maxY=Math.max(0,this._size.h*100-h);
+
         this._cam.x=Math.min(
-            Math.max(0, (p.x+p.w/2)-w/2),
-            (this._size.w*100-w)
+            Math.max(0,(p.x+p.w/2)-w/2),
+            maxX
         );
+
         this._cam.y=Math.min(
-            Math.max(0, (p.y+p.h/2)-h/2),
-            (this._size.h*100-h)
+            Math.max(0,(p.y+p.h/2)-h/2),
+            maxY
         );
         this._cam.w=w;
         this._cam.h=h;
@@ -71,13 +80,11 @@ export class Render{
         )
     }
     #renderWorld(){
-        const p=this._entities.find(e=>e.id==this._playerId);
-        if(p==null)return;
         const 
-            sX=Math.max(Math.floor((p.x-(p.x-this._cam.x))/100), 0), 
-            eX=Math.min(Math.ceil((p.x+(this._cam.x+this._cam.w-p.x))/100), this._size.w),
-            sY=Math.max(Math.floor((p.y-(p.y-this._cam.y))/100), 0),
-            eY=Math.min(Math.ceil((p.y+(this._cam.y+this._cam.h-p.y))/100), this._size.h);
+            sX=Math.max(Math.floor(this._cam.x/100), 0), 
+            eX=Math.min(Math.ceil((this._cam.x+this._cam.w)/100), this._size.w),
+            sY=Math.max(Math.floor(this._cam.y/100), 0),
+            eY=Math.min(Math.ceil((this._cam.y+this._cam.h)/100), this._size.h);
 
         for(let x=sX; x<eX; x++){
             for(let y=sY; y<eY; y++){
@@ -159,13 +166,6 @@ class RenderEngine{
             }
         };
         this.#useProgram("basic");
-
-        this.update();
-    }
-
-    update(){
-        gl.useProgram(this.#actProgram.obj);
-        if(gl.getAttribLocation(this.#actProgram.obj, "color")){}
     }
 
     //basic
@@ -256,6 +256,7 @@ class RenderEngine{
         this.#actProgram.program = p;
         this.#actProgram.obj = this.#programs[p].obj;
         this.#actProgram.drawConfig=this.#programs[p].drawConfig;
+        gl.useProgram(this.#actProgram.obj);
     }
 }
 

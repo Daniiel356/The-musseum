@@ -124,8 +124,7 @@
             if(!(downEvent.target==ui || downEvent.target==touchpad))return;
             document.addEventListener("pointerup", (upEvent)=>{
                 if(upEvent.pointerId===downEvent.pointerId && document.elementsFromPoint(upEvent.clientX, upEvent.clientY).includes(canvas)){
-                    const rect=canvas.getBoundingClientRect();
-                    window.game.clickEvent(upEvent.clientX-rect.x, upEvent.clientY-rect.y);
+                    window.game.clickEvent(upEvent.clientX, upEvent.clientY);
                 }
             }, {once: true});
         });
