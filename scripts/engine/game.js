@@ -56,6 +56,7 @@ export class Game{
                     if(e.id==this.#playerId)e.input=window.game.engine.input;
                 });
             };
+            window.game.clickEvent=(x, y)=>this.#clickEvent(x, y);
         }
 
         this.#render._blocks=this.#world.cont;
@@ -95,6 +96,16 @@ export class Game{
         if(this.#inloop)requestAnimationFrame((x)=>this.loop(x));
     }
 
+    #clickEvent(x, y){
+        const p=this.#world.entities.find((e)=>e.id==this.#playerId);
+        const cam=this.#render._cam;
+        x*=this.#render.getScaleX(); y*=this.#render.getScaleY();
+        const ang=Math.atan2(
+            (y+cam.y)-(p.y-p.h), (x+cam.x)-(p.x+p.w)
+        );
+        console.log(Math.cos(ang))
+        //this.#world.playerEvent({type: "click", id: this.#playerId, data: {ang, dif}});
+    }
 
     get world(){return this.#world};
 }

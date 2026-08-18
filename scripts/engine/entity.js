@@ -25,6 +25,8 @@ export class Entity{
 }
 
 export async function parserEntities(rawEntitiesSource){
+    const logs=[];
+    const warns=[];
     const finallyEntities=[];
     for(const entities of rawEntitiesSource){
         const res=await fetch("assets/entities/"+entities.src+".json");
@@ -44,11 +46,11 @@ export async function parserEntities(rawEntitiesSource){
 
                 finallyEntities.push(newEntity);
 
-                console.log(`Entidad ${identifier} cargada.`);
+                logs.push(`Entidad ${identifier} cargada.`);
             }else{
-                console.warn(`[ERROR] Error al cargar la entidad '${identifier}' del mundo no se encontro dentro de '${rawEntitiesSource}'`)
+                warns.push(`[ERROR] Error al cargar la entidad '${identifier}' del mundo no se encontro dentro de '${rawEntitiesSource}'`)
             }
         }
     }
-    return finallyEntities;
+    return [finallyEntities, {log: logs, warn: warns}];
 }

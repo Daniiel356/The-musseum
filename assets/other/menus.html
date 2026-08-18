@@ -37,7 +37,8 @@
         <div class="slot"></div>
     </div>
 
-    <script> 
+    <script>
+        //<---JoyStick/MoveInput--->
         const touchpad=document.getElementById("touchpad");
         const joy=document.getElementById("joy");
         const stick=document.getElementById("stick");
@@ -86,6 +87,18 @@
             e.target.setPointerCapture(e.pointerId);
         }
 
+        joy.addEventListener("pointerdown", start);
+        document.addEventListener("pointermove", move);
+        document.addEventListener("pointerup", end);
+
+        window.addEventListener("resize", ()=>{
+            rect=joy.getBoundingClientRect();
+            joyX=rect.left + rect.width/2;
+            joyY=rect.top + rect.height/2;
+            r=rect.width/2;
+        });
+
+        //<---Inventory/Rightbar--->
         let focusSlot=-1;
 
         for(let i=0; i<rightbar.children.length; i++){
@@ -101,17 +114,26 @@
                 }
             });
         }
+        //<---Touch/ClickInput--->
+        const canvas=document.querySelector("canvas");
+        let bodyW=document.body.clientWidth;
+        let bodyH=document.body.clientHeight;
+        const ui=document.querySelector("#ui");
 
-        joy.addEventListener("pointerdown", start);
-        document.addEventListener("pointermove", move);
-        document.addEventListener("pointerup", end);
+        ui.addEventListener("pointerdown", (downEvent)=>{
+            if(!(downEvent.target==ui || downEvent.target==touchpad))return;
+            document.addEventListener("pointerup", (upEvent)=>{
+                if(upEvent.pointerId===downEvent.pointerId && document.elementsFromPoint(upEvent.clientX, upEvent.clientY).includes(canvas)){
+                    const rect=canvas.getBoundingClientRect();
+                    window.game.clickEvent(upEvent.clientX-rect.x, upEvent.clientY-rect.y);
+                }
+            }, {once: true});
+        });
 
         window.addEventListener("resize", ()=>{
-            rect=joy.getBoundingClientRect();
-            joyX=rect.left + rect.width/2;
-            joyY=rect.top + rect.height/2;
-            r=rect.width/2;
-        })
+            bodyW=document.body.clientWidth;
+            bodyH=document.body.clientHeight;
 
+        });
     </script>
 </template>

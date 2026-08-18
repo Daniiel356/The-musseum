@@ -1,6 +1,7 @@
 export async function parserBlocks(rawBlocksSource){
+    const blocksInfoLog=[];
+    const blocksWarnLog=[];
     const Blocks=[];
-    const Floors=[];
 
     //BLOCKS
     for(const blocksGroup of rawBlocksSource.blocks){
@@ -10,7 +11,7 @@ export async function parserBlocks(rawBlocksSource){
         for(const [identifier, src] of Object.entries(blocksGroup.import)){
             const i=blocksBase.findIndex((e)=>e.name==src);
             if(i==-1){
-                console.warn("Error al cargar el bloque", identifier, ", no se encontró", src, "en", blocksGroup.src);
+                blocksWarnLog.push(`Error al cargar el bloque '${identifier}', no se encontró '${src}' en '${blocksGroup.src}'.`);
                 continue;
             }
 
@@ -24,11 +25,15 @@ export async function parserBlocks(rawBlocksSource){
             };
 
             Blocks.push(newBlock);
-            console.log(`Bloque ${identifier} cargado desde ${blocksGroup.src}/${src}`);
+            blocksInfoLog.push(`Bloque ${identifier} cargado desde ${blocksGroup.src}/${src}`);
         }
     }
 
     //FLOOR
+    const Floors=[];
+    const floorInfoLog=[];
+    const floorWarnLog=[];
+
     for(const floorsGroup of rawBlocksSource.floors){
         const res=await fetch("assets/blocks/floors/"+floorsGroup.src+".json");
         const floorsBase=await res.json();
@@ -36,7 +41,7 @@ export async function parserBlocks(rawBlocksSource){
         for(const [identifier, src] of Object.entries(floorsGroup.import)){
             const i=floorsBase.findIndex((e)=>e.name==src);
             if(i==-1){
-                console.warn("Error al cargar el suelo", identifier, ", no se encontró", src, "en", floorsGroup.src);
+                floorWarnLog.push(`Error al cargar el suelo '${identifier}', no se encontró '${src}' en '${floorsGroup.src}'`);
                 continue;
             }
 
@@ -49,7 +54,7 @@ export async function parserBlocks(rawBlocksSource){
                 style: base.style
             };
             Floors.push(newFloor);
-            console.log(`Suelo ${identifier} cargado desde ${floorsGroup.src}/${src}`);
+            floorInfoLog.push(`Suelo ${identifier} cargado desde ${floorsGroup.src}/${src}`);
         }
     }
 
@@ -61,5 +66,6 @@ export async function parserBlocks(rawBlocksSource){
     for(const f of Floors){
         finallyFloors[f.id]=f;
     }
-    return [finallyBlocks, finallyFloors];
+
+    return [finallyBlocks, finallyFloors, {log: [...blocksInfoLog, ...floorInfoLog], warn: [...blocksWarnLog, ...floorWarnLog]}];
 }

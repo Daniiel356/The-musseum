@@ -7,6 +7,9 @@ html, body, #ui{
     user-select: none;
     -webkit-user-select: none;
 }
+:root{
+    --mobile: solid;
+}
 canvas{
     padding: 0; margin: 0;
     position: absolute;
@@ -40,7 +43,6 @@ canvas{
 #touchpad{
     position: absolute;
     width: 50%; height: 100%;
-    background: rgba(0,0,255,0.1);
 }
 #joy{
     position: absolute;
@@ -49,6 +51,7 @@ canvas{
     height: 40vh; width: 40vh;;
     border-radius: 50%; border: solid rgba(255,255,255,0.2) 2px;
     background: rgba(20,20,20,0.65);
+    display: var(--mobile);
 }
 #stick{
     position: absolute;

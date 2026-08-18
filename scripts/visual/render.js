@@ -2,8 +2,9 @@ const canvas=document.querySelector("canvas");
 const gl=canvas.getContext("webgl2");
 const buffer=gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+gl.clearColor(0, 0, 0, 0.005);
 let scale={w:1, h:1};
-let glScale={w: 0, h:0};
+let glScale={w: 0, h:0, rw:0, rh:0};
 
 export class Render{
     #engine=new RenderEngine();
@@ -15,7 +16,9 @@ export class Render{
     _entities=[];
     _playerId=-1;
     _zoom={value: 1, step: 0.01, max: 1.25, min:0.95};
-    _camX=0; _camY=0;
+    _cam={
+        x:0, y:0, w:0, h:0
+    }
 
     constructor(){
         window.addEventListener("wheel", (e)=>{
@@ -29,7 +32,6 @@ export class Render{
     }
 
     render(){
-        this.#engine.clear();
         this.#engine.scale(this._zoom.value*scale.w, this._zoom.value*scale.h);
         this.#calcCam();
         this.#renderWorld();
@@ -37,33 +39,73 @@ export class Render{
             this.#renderEntity(entity);
         }
         this.#engine.draw();
-        this.#engine.clearEffects();
+    }
+
+    getScaleX(){
+        return this._zoom.value*scale.w;
+    }
+    getScaleY(){
+        return this._zoom.value*scale.h;
     }
 
     #calcCam(){
         const w=canvas.width/scale.w/this._zoom.value;
         const h=canvas.height/scale.h/this._zoom.value;
-        this._entities.forEach((e)=>{
-            if(e.id==this._playerId){
-                const x=(e.x+e.w/2)-w/2;
-                const y=(e.y+e.h/2)-h/2;
-                this.#engine.offset(
-                    -Math.min(Math.max(0, x), (this._size.w*100-w)),
-                    -Math.min(Math.max(0, y), (this._size.h*100-h))
-                )
-            }
-        })
+        const p=this._entities.find(e=>e.id==this._playerId);
+        if(!p)return;
+
+        this._cam.x=Math.min(
+            Math.max(0, (p.x+p.w/2)-w/2),
+            (this._size.w*100-w)
+        );
+        this._cam.y=Math.min(
+            Math.max(0, (p.y+p.h/2)-h/2),
+            (this._size.h*100-h)
+        );
+        this._cam.w=w;
+        this._cam.h=h;
+
+        this.#engine.offset(
+            -this._cam.x,
+            -this._cam.y
+        )
     }
     #renderWorld(){
-        for(let i=0; i<this._floor.length; i++){
-            const x=i%this._size.w;
-            const y=Math.floor(i/this._size.w);
-            const f=this._floor[y*(this._size.w)+x];
-            const s=this._floorSource[f+''].style;
-            this.#engine.setFliiColor(s.bg);
-            this.#engine.fillRect(x*100, y*100, 100, 100);
+        const p=this._entities.find(e=>e.id==this._playerId);
+        if(p==null)return;
+        const 
+            sX=Math.max(Math.floor((p.x-(p.x-this._cam.x))/100), 0), 
+            eX=Math.min(Math.ceil((p.x+(this._cam.x+this._cam.w-p.x))/100), this._size.w),
+            sY=Math.max(Math.floor((p.y-(p.y-this._cam.y))/100), 0),
+            eY=Math.min(Math.ceil((p.y+(this._cam.y+this._cam.h-p.y))/100), this._size.h);
+
+        for(let x=sX; x<eX; x++){
+            for(let y=sY; y<eY; y++){
+                const i=y*(this._size.w)+x;
+
+                const floor=this._floorSource[this._floor[i]+''].style;
+                const block=this._blocksSource[this._blocks[i]+''];
+
+                this.#engine.setFliiColor(floor.bg);
+                this.#engine.fillRect(
+                    x*100,
+                    y*100,
+                    100,
+                    100
+                );
+
+                if(this._blocks[i]=='0' || block.style.hidden)continue;
+                this.#engine.setFliiColor(block.style.bg);
+                this.#engine.fillRect(
+                    x*100+block.logic.x,
+                    y*100+block.logic.y,
+                    block.logic.w,
+                    block.logic.h
+                );
+            }
         }
     }
+
     #renderEntity(entity){
         this.#engine.setFliiColor(entity.style.bg);
         this.#engine.fillRect(entity.x, entity.y, entity.w, entity.h);
@@ -118,22 +160,12 @@ class RenderEngine{
         };
         this.#useProgram("basic");
 
-        console.log(this.#programs, this.#actProgram)
         this.update();
     }
 
     update(){
         gl.useProgram(this.#actProgram.obj);
         if(gl.getAttribLocation(this.#actProgram.obj, "color")){}
-    }
-
-    #useProgram(p){
-        if(!this.#programs[p])
-            throw new Error("No existe el programa '"+p+"'");
-
-        this.#actProgram.program = p;
-        this.#actProgram.obj = this.#programs[p].obj;
-        this.#actProgram.drawConfig=this.#programs[p].drawConfig;
     }
 
     //basic
@@ -145,11 +177,12 @@ class RenderEngine{
 
     fillRect(x, y, w, h){
         const offX=this.#effect.offset.x, offY=this.#effect.offset.y;
+        const sW=this.#effect.scale.w, sH=this.#effect.scale.h;
         const 
-            a=[(x+offX)*glScale.w -1, 1- (y+offY)*glScale.h], //TopLeft
-            b=[(x+w+offX)*glScale.w -1, 1- (y+offY)*glScale.h],//TopRight
-            c=[(x+w+offX)*glScale.w -1, 1- (y+h+offY)*glScale.h],//BottomRight
-            d=[(x+offX)*glScale.w -1, 1- (y+h+offY)*glScale.h];//BotomLeft
+            a=[(x+offX)*sW*glScale.w -1, 1- (y+offY)*sH*glScale.h], //TopLeft
+            b=[(x+w+offX)*sW*glScale.w -1, 1- (y+offY)*sH*glScale.h],//TopRight
+            c=[(x+w+offX)*sW*glScale.w -1, 1- (y+h+offY)*sH*glScale.h],//BottomRight
+            d=[(x+offX)*sW*glScale.w -1, 1- (y+h+offY)*sH*glScale.h];//BotomLeft
 
         this.#vertexs.push(
             ...a, ...this.#actProgram.color,
@@ -169,6 +202,7 @@ class RenderEngine{
             new Float32Array(this.#vertexs),
             gl.STATIC_DRAW
         );
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
         gl.drawArrays(
             gl.TRIANGLES,
@@ -177,18 +211,15 @@ class RenderEngine{
         );
         this.#vertexs=[];
     }
-    clear(){
-
-    }
 
     //effects
     offset(x, y){
         this.#effect.offset.x=x;
         this.#effect.offset.y=y;
     }
-    scale(w, h){}
-    clearEffects(){
-
+    scale(w, h){
+        this.#effect.scale.w=w;
+        this.#effect.scale.h=h;
     }
 
     #createProgram(...shaders){
@@ -218,6 +249,14 @@ class RenderEngine{
         }
         return shader;
     }
+    #useProgram(p){
+        if(!this.#programs[p])
+            throw new Error("No existe el programa '"+p+"'");
+
+        this.#actProgram.program = p;
+        this.#actProgram.obj = this.#programs[p].obj;
+        this.#actProgram.drawConfig=this.#programs[p].drawConfig;
+    }
 }
 
 
@@ -241,8 +280,6 @@ function resizeCanvas(){
     glScale.w=2/canvas.width;
     glScale.h=2/canvas.height;
 }
-
-
 
 window.addEventListener("resize", ()=>{resizeCanvas()});
 resizeCanvas();

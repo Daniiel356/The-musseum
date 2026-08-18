@@ -5,7 +5,7 @@ git config --local --add safe.directory "%cd%"
 
 git add .
 
-git commit -m "Auto-commit: %date% %time%: %1"
+git commit -m "Auto-commit %date% %time%: %1"
 
 git push origin "main"
 

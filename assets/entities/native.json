@@ -3,6 +3,7 @@
         "name": "tuto_player",
         "style":{ "bg":"255,0,0" },
         "logic":{
+            "solid":true,
             "w":80, "h":100,
             "v": 5
         },
