@@ -48,10 +48,10 @@ function PCMode(){
 
 function actKeys(){
     const input={x:0, y:0};
-    if(keys["KeyW"])input.y-=1;
-    if(keys["KeyA"])input.x-=1;
-    if(keys["KeyS"])input.y+=1;
-    if(keys["KeyD"])input.x+=1;
+    if(keys["KeyW"]||keys["ArrowUp"])input.y-=1;
+    if(keys["KeyA"]||keys["ArrowLeft"])input.x-=1;
+    if(keys["KeyS"]||keys["ArrowDown"])input.y+=1;
+    if(keys["KeyD"]||keys["ArrowRight"])input.x+=1;
 
     window.game.engine.input=input;
 }

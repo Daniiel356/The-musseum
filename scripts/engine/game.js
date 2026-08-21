@@ -1,7 +1,6 @@
 import { Connection } from "../connection/conection.js";
 import { Render } from "../visual/render.js";
-import { World } from "./world/world.js";
-import { loadWorld } from "./world/utils.js";
+import { World, loadWorld } from "./world/world.js";
 
 export class Game{
     #conection=new Connection();

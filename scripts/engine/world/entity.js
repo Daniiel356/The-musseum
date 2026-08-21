@@ -1,4 +1,4 @@
-export class Entity{
+class Entity{
     id=-1;
     w=0; h=0;
     x=0; y=0;
@@ -24,7 +24,7 @@ export class Entity{
     }
 }
 
-export async function parserEntities(rawEntitiesSource){
+async function parserEntities(rawEntitiesSource){
     const logs=[];
     const warns=[];
     const finallyEntities=[];
@@ -54,3 +54,5 @@ export async function parserEntities(rawEntitiesSource){
     }
     return [finallyEntities, {log: logs, warn: warns}];
 }
+
+export { Entity, parserEntities}

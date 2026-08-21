@@ -1,5 +1,5 @@
-import { Entity, parserEntities } from "../entity.js";
-import { parserBlocks } from "../blocks.js";
+import { Entity, parserEntities } from "./entity.js";
+import { parserBlocks } from "./blocks.js";
 
 class World{
     frec=1000/50;
@@ -178,5 +178,12 @@ class World{
         }
     }
 }
+async function loadWorld(name){
+    const res=await fetch("./assets/worlds/"+name+".json");
+    if(!res.ok)throw new Error("Error al cargar el mundo "+name);
 
-export {World}
+    return await res.json();
+}
+
+
+export {World, loadWorld}

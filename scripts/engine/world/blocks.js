@@ -1,4 +1,4 @@
-export async function parserBlocks(rawBlocksSource){
+async function parserBlocks(rawBlocksSource){
     const blocksInfoLog=[];
     const blocksWarnLog=[];
     const Blocks=[];
@@ -69,3 +69,5 @@ export async function parserBlocks(rawBlocksSource){
 
     return [finallyBlocks, finallyFloors, {log: [...blocksInfoLog, ...floorInfoLog], warn: [...blocksWarnLog, ...floorWarnLog]}];
 }
+
+export {parserBlocks}
