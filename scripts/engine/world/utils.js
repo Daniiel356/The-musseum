@@ -1,5 +1,5 @@
 const context={
-    blocks:{cont: [], data: []},
+    blocks:{cont: [], data: {}},
     world:{size: {w:0, h:0}}
 }
 
@@ -11,6 +11,7 @@ function colidesBlock(a, fun){
         for(let y=Math.max(sY, 0); y<Math.min(eY, context.world.size.h); y++){
             let b=context.blocks.cont[y*context.world.size.w+x];
             if(b==0)continue;
+            
             b=context.blocks.data[b+''].logic;
 
             if(b.solid &&

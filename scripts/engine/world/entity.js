@@ -53,7 +53,7 @@ class EntityManager{
         return id;
     }
 
-    update(){
+    update(){        
         this._entities.forEach(e=>{
             if(e.type=="player"){
                 const dif={x:0, y:0};

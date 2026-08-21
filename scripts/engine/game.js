@@ -62,9 +62,9 @@ export class Game{
         this.#habilities=this.#conection.request("habilities", this.#playerId);
 
         this.#render._blocks=this.#world.cont;
-        this.#render._blocksSource=this.#world._blocksClass;
+        this.#render._blocksSource=this.#world.blocksData;
         this.#render._floor=this.#world.floor;
-        this.#render._floorSource=this.#world._floorClass;        
+        this.#render._floorSource=this.#world.floorData;        
         this.#render._entities=this.#world.getEntities();
         this.#render._playerId=this.#playerId;
     }

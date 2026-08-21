@@ -1,5 +1,5 @@
 import { EntityManager } from "./entity.js";
-import { parserBlocks } from "./blocks.js";
+import { ContentManager } from "./blocks.js";
 import { context } from "./utils.js"
 
 class World{
@@ -7,38 +7,36 @@ class World{
     #special={};
 
     #worldBlocks=[];
+    #worldEntities=[];
     _size={w:0,h:0};
 
-    #cont=[];
-    _blocksClass=[];
-    #floor=[];
-    _floorClass=[];
-
+    #contManager=new ContentManager(this);
     #entityManager=new EntityManager(this);
-    #worldEntities=[];
     hitboxes=[];
 
     friction=8;
     frec=1000/50;
 
-    get cont(){return this.#cont};
-    get floor(){return this.#floor};
     getEntities(){ return this.#entityManager._entities }
+    get cont(){ return this.#contManager._blocks }
+    get blocksData(){ return this.#contManager._blocksData }
+    get floor(){ return this.#contManager._floor }
+    get floorData(){ return this.#contManager._floorData}
 
     constructor(data){
-        this.#cont=data?.cont||[];
-        this.#floor=data?.floor||[];
         this._name=data?.head?.name||"unnamed";
         this._size=data?.head?.size||{w:0,h:0};
+
         this.#special=data?.special||{};
+        this.#contManager._blocks=data?.cont||[];
+        this.#contManager._floor=data?.floor||[];
+
         this.#worldEntities=data?.entities||[];
         this.#worldBlocks=data?.blocks||[];
     }
 
     async init(){
-        let blocksInfo={};
-
-        [this._blocksClass, this._floorClass, blocksInfo]=await parserBlocks(this.#worldBlocks||[]);        
+        const blocksInfo=await this.#contManager.parse(this.#worldBlocks||[]);        
         const entityInfo=await this.#entityManager.parse(this.#worldEntities||[]);
 
         if(entityInfo.warn.length==0 && blocksInfo.warn.length==0){
@@ -47,8 +45,6 @@ class World{
             throw new Error("Error al cargar el mundo.\n"+entityInfo.warn.map(e=>e+"\n"));
         }
         context.world.size=this._size;
-        context.blocks.data=this._blocksClass;
-        context.blocks.cont=this.#cont;
     }
 
     update(){
@@ -67,17 +63,12 @@ class World{
 
     spawnPlayer(){
         let list=[];
-        let spawnerBlocks=[];
-        for(let key of Object.keys(this._blocksClass)){            
-            if(this.#special.players.spawnerBlocks.includes(key))spawnerBlocks.push(key);
-        }
 
-        for(let i=0; i<this.#cont.length; i++){
-            const b=this.#cont[i];
-            if(spawnerBlocks.includes(b+'')){
-                list.push({x: i%this._size.w, y:  Math.floor(i/this._size.w)});
-            }
-        }
+        this.#contManager.findBlocksIndexs((e)=>
+            this.#special.players.spawnerBlocks.includes(e.id+'')
+        ).forEach((i)=>{
+            list.push({x: i%this._size.w, y:  Math.floor(i/this._size.w)})
+        });
         if(list.length==0){
             throw new Error("[ERROR] Error al spawnear un jugador: no se encontro ningún bloque tipo generador.");
         }
