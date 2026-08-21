@@ -1,9 +1,8 @@
-import { Entity, parserEntities } from "./entity.js";
+import { EntityManager } from "./entity.js";
 import { parserBlocks } from "./blocks.js";
+import { context } from "./utils.js"
 
 class World{
-    frec=1000/50;
-
     _name="";
     #special={};
 
@@ -15,15 +14,16 @@ class World{
     #floor=[];
     _floorClass=[];
 
-    entities=[];
+    #entityManager=new EntityManager(this);
     #worldEntities=[];
-    _entityClass=[];
     hitboxes=[];
 
     friction=8;
+    frec=1000/50;
 
     get cont(){return this.#cont};
-    get floor(){return this.#floor}
+    get floor(){return this.#floor};
+    getEntities(){ return this.#entityManager._entities }
 
     constructor(data){
         this.#cont=data?.cont||[];
@@ -36,40 +36,23 @@ class World{
     }
 
     async init(){
-        let entityInfo={};
         let blocksInfo={};
 
         [this._blocksClass, this._floorClass, blocksInfo]=await parserBlocks(this.#worldBlocks||[]);        
-        [this._entityClass, entityInfo]=await parserEntities(this.#worldEntities||[]);
+        const entityInfo=await this.#entityManager.parse(this.#worldEntities||[]);
 
         if(entityInfo.warn.length==0 && blocksInfo.warn.length==0){
             console.log("Parseo del mundo terminado con éxito. Logs:", [...entityInfo.log, ...blocksInfo.log]);
+        }else{
+            throw new Error("Error al cargar el mundo.\n"+entityInfo.warn.map(e=>e+"\n"));
         }
+        context.world.size=this._size;
+        context.blocks.data=this._blocksClass;
+        context.blocks.cont=this.#cont;
     }
 
     update(){
-        this.entities.forEach(e=>{
-            if(e.type=="player"){
-                const dif={x:0, y:0};
-                e.vx+=e.input.x*e.v;
-                e.vy+=e.input.y*e.v;
-
-                this.#colidesBlock({...e, x:e.x+e.vx}, (b)=>{
-                    dif.x=e.vx>0? b.x-(e.x+e.w) : (b.x+b.w)-e.x;
-                    e.vx=0;
-                });
-                e.x=Math.max(Math.min(e.x+e.vx+dif.x, this._size.w*100), 0);
-
-                this.#colidesBlock({...e, y:e.y+e.vy}, (b)=>{
-                    dif.y=e.vy>0? b.y-(e.y+e.h) : (b.y+b.h)-e.y;
-                    e.vy=0;
-                });
-                e.y=Math.max(Math.min(e.y+e.vy+dif.y, this._size.h*100-e.h), 0);
-
-                e.vx=Math.abs(e.vx)<=this.friction? 0:e.vx+(Math.sign(e.vx)*this.friction);
-                e.vy=Math.abs(e.vy)<=this.friction? 0:e.vy+(Math.sign(e.vy)*this.friction);
-            }
-        });
+        this.#entityManager.update();
     }
 
     playerEvent(event){
@@ -115,13 +98,10 @@ class World{
             }
         });
 
-        const pId=this.#summonEntity("player", x*100, y*100);
-        this.entities.forEach((e)=>{
-            if(e.id==pId){
-                e.tags.role=role;
-                return;
-            }
-        });
+        const pId=this.#entityManager.summon("player", x*100, y*100);
+        const p=this.#entityManager.find(pId);
+        p.tags.role=role;
+
         console.log("Jugador con la ID", pId, "generada");
         return pId;
     }
@@ -138,46 +118,17 @@ class World{
                 console.warn("No se puede transformar las coordenadas a numeros")
             }
 
-            return this.#summonEntity(name, x, y);
+            return this.#entityManager.summon(name, x, y);
         }
     }
 
-    #summonEntity(identifier, x, y){
-        const index=this._entityClass.findIndex((e)=>e.name==identifier);
-        if(index==-1){
-            console.warn(`No se encontro la entidad '${identifier}'`);
-            return;
-        }
-
-        let id=0;
-        while(this.entities.findIndex((e)=>e.id==id)!=-1)id++;
-        const entity=new Entity(this._entityClass[index], id);
-        entity.setPos(x, y);
-        this.entities.push(entity);
-        return id;
-    }
-
-    #colidesBlock(a, fun){
-        const sX=Math.floor(a.x/100)-1, eX=Math.ceil(a.x/100)+1;
-        const sY=Math.floor(a.y/100)-1, eY=Math.ceil(a.y/100)+1;
-
-        for(let x=Math.max(sX, 0); x<Math.min(eX, this._size.w); x++){
-            for(let y=Math.max(sY, 0); y<Math.min(eY, this._size.h); y++){
-                let b=this.#cont[y*this._size.w+x];
-                if(b==0)continue;
-                b=this._blocksClass[b+''].logic;
-
-                if(b.solid &&
-                    a.x+a.w>x*100+b.x && a.x<x*100+b.x+b.w &&
-                    a.y+a.h>y*100+b.y && a.y<y*100+b.y+b.h
-                ){
-                    fun({x: x*100+b.x, y:y*100+b.y, w: b.w, h:b.h});
-                    return;
-                }
-            }
-        }
+    actEntity(id, fun){
+        const e=this.#entityManager.find(id);
+        if(e)fun(e);
+        else throw new Error("No se encontro la entidad con la id "+id)
     }
 }
+
 async function loadWorld(name){
     const res=await fetch("./assets/worlds/"+name+".json");
     if(!res.ok)throw new Error("Error al cargar el mundo "+name);

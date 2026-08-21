@@ -53,8 +53,8 @@ export class Game{
             };
 
             this.#actControls=()=>{
-                this.#world.entities.forEach(e=>{
-                    if(e.id==this.#playerId)e.input=window.game.engine.input;
+                this.#world.actEntity(this.#playerId, e=>{
+                    e.input=window.game.engine.input;
                 });
             };
         }
@@ -65,7 +65,7 @@ export class Game{
         this.#render._blocksSource=this.#world._blocksClass;
         this.#render._floor=this.#world.floor;
         this.#render._floorSource=this.#world._floorClass;        
-        this.#render._entities=this.#world.entities;
+        this.#render._entities=this.#world.getEntities();
         this.#render._playerId=this.#playerId;
     }
 
