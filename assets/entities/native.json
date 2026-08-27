@@ -6,7 +6,8 @@
             "solid":true,
             "w":80, "h":100,
             "v": 5,
-            "healt":100
+            "healt":100,
+            "canHit": true
         },
         "type":"player",
         "habilities":[

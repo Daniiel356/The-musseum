@@ -98,7 +98,7 @@
             r=rect.width/2;
         });
 
-        //<---Inventory/Rightbar--->
+        //<---Habilities/Rightbar--->
         let focusSlot=-1;
 
         for(let i=0; i<rightbar.children.length; i++){
@@ -106,6 +106,8 @@
             elem.addEventListener("pointerdown", ()=>{
                 if(focusSlot==i)focusSlot=-1;
                 else focusSlot=i;
+                window.game.engine.input.hability=focusSlot;
+                console.log("se cambio el slot", focusSlot)
 
                 for(let i=0; i<rightbar.children.length; i++){
                     const slot=rightbar.children[i];
@@ -113,6 +115,7 @@
                     else  slot.dataset.focused="0";
                 }
             });
+            window.game.engine.input.hability=-1;
         }
         //<---Touch/ClickInput--->
         const canvas=document.querySelector("canvas");

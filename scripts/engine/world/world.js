@@ -18,6 +18,7 @@ class World{
     frec=1000/50;
 
     getEntities(){ return this.#entityManager._entities }
+    findEntity(id){ return this.#entityManager.find(id) }
     get cont(){ return this.#contManager._blocks }
     get blocksData(){ return this.#contManager._blocksData }
     get floor(){ return this.#contManager._floor }
@@ -52,11 +53,13 @@ class World{
     }
 
     playerEvent(event){
-        const p=this.entities.find((e)=>e.id==event.id&&e.type=="player");
+        const p=this.#entityManager.find(event.id);
         const data=event.data;
+        console.log(p)
         if(event.type="click"){
-            if(!p.canHit)return;
-            p.special.canHit=false;
+            console.log(p.input.hability)
+            if(p.input.hability!=-1)return;
+            console.log("interac")
             p.style.bg="0,255,0";
         }
     }
@@ -126,6 +129,5 @@ async function loadWorld(name){
 
     return await res.json();
 }
-
 
 export {World, loadWorld}

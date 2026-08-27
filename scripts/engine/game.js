@@ -99,7 +99,7 @@ export class Game{
     }
 
     #clickEvent(x, y){
-        const p=this.#world.entities.find((e)=>e.id==this.#playerId);
+        const p=this.#world.findEntity(this.#playerId);
         x=this.#render.screenToWorldX(x); y=this.#render.screenToWorldY(y);
         const dx=x-(p.x+p.w/2);
         const dy=y-(p.y+p.h/2);

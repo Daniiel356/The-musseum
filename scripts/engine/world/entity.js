@@ -18,6 +18,7 @@ class Entity{
         this.type=data.type||"solid";
         Object.assign(this, data.logic);
         this.style=data.style;
+        this.input.hability=-1;
     }
 
     setPos(x, y){
