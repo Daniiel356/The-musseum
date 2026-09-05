@@ -3,7 +3,7 @@ class Entity{
     id=-1;
     w=0; h=0;
     x=0; y=0;
-    v=5;
+    v=0;
     vx=0; vy=0;
     input={};
     type="solid";
@@ -26,10 +26,12 @@ class Entity{
     }
 }
 
+
 class EntityManager{
     #world;
     _data=[];
     _entities=[];
+    _tile=32;
 
     constructor(world){
         this.#world=world;
@@ -65,13 +67,13 @@ class EntityManager{
                     dif.x=e.vx>0? b.x-(e.x+e.w) : (b.x+b.w)-e.x;
                     e.vx=0;
                 });
-                e.x=Math.max(Math.min(e.x+e.vx+dif.x, this.#world._size.w*100), 0);
+                e.x=Math.max(Math.min(e.x+e.vx+dif.x, this.#world._size.w*this._tile), 0);
 
                 colidesBlock({...e, y:e.y+e.vy}, (b)=>{
                     dif.y=e.vy>0? b.y-(e.y+e.h) : (b.y+b.h)-e.y;
                     e.vy=0;
                 });
-                e.y=Math.max(Math.min(e.y+e.vy+dif.y, this.#world._size.h*100-e.h), 0);
+                e.y=Math.max(Math.min(e.y+e.vy+dif.y, this.#world._size.h*this._tile-e.h), 0);
 
                 e.vx=Math.abs(e.vx)<=this.#world.friction? 0:e.vx+(Math.sign(e.vx)*this.friction);
                 e.vy=Math.abs(e.vy)<=this.#world.friction? 0:e.vy+(Math.sign(e.vy)*this.friction);
