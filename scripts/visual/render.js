@@ -3,9 +3,7 @@ const gl=canvas.getContext("webgl2");
 const buffer=gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 gl.clearColor(0, 0, 0, 0.005);
-let scale={w:1, h:1};
 let glScale={w: 0, h:0, rw:0, rh:0};
-const tile=100;
 
 export class Render{
     #engine=new RenderEngine();
@@ -20,12 +18,28 @@ export class Render{
     _cam={
         x:0, y:0, w:0, h:0
     }
+    _scale={w:1, h:1};
+    _tile=32;
+    _camRange={
+        w: 10, h: 5
+    }
 
     constructor(){
         window.addEventListener("wheel", (e)=>{
             const dir=Math.sign(e.deltaY);
             this._zoom.value=Math.max(this._zoom.min, Math.min(this._zoom.value+this._zoom.step*dir, this._zoom.max));
         });
+        
+        window.addEventListener("resize", ()=>{
+            this._scale={
+                w: canvas.width/this._tile/this._camRange.w,
+                h: canvas.height/this._tile/this._camRange.h
+            }
+        });
+        this._scale={
+            w: canvas.width/this._tile/this._camRange.w,
+            h: canvas.height/this._tile/this._camRange.h
+        }
     }
 
     async init(){
@@ -33,7 +47,7 @@ export class Render{
     }
 
     render(){
-        this.#engine.scale(this._zoom.value*scale.w, this._zoom.value*scale.h);
+        this.#engine.scale(this._zoom.value*this._scale.w, this._zoom.value*this._scale.h);
         this.#calcCam();
         this.#renderWorld();
         for(const entity of this._entities){
@@ -45,23 +59,23 @@ export class Render{
     screenToWorldX(x){
         const rect=canvas.getBoundingClientRect();
         const canvasX=(x-rect.left)*(canvas.width/rect.width);
-        return canvasX/(this._zoom.value*scale.w)+this._cam.x;
+        return canvasX/(this._zoom.value*this._scale.w)+this._cam.x;
     }
     screenToWorldY(y){
         const rect=canvas.getBoundingClientRect();
         const canvasY=(y-rect.top)*(canvas.height/rect.height);
 
-        return canvasY/(this._zoom.value*scale.h)+this._cam.y;
+        return canvasY/(this._zoom.value*this._scale.h)+this._cam.y;
     }
 
     #calcCam(){
-        const w=canvas.width/scale.w/this._zoom.value;
-        const h=canvas.height/scale.h/this._zoom.value;
+        const w=canvas.width/this._scale.w/this._zoom.value;
+        const h=canvas.height/this._scale.h/this._zoom.value;
         const p=this._entities.find(e=>e.id==this._playerId);
         if(!p)return;
 
-        const maxX=Math.max(0,this._size.w*tile-w);
-        const maxY=Math.max(0,this._size.h*tile-h);
+        const maxX=Math.max(0,this._size.w*this._tile-w);
+        const maxY=Math.max(0,this._size.h*this._tile-h);
 
         this._cam.x=Math.min(
             Math.max(0,(p.x+p.w/2)-w/2),
@@ -82,10 +96,10 @@ export class Render{
     }
     #renderWorld(){
         const 
-            sX=Math.max(Math.floor(this._cam.x/tile), 0), 
-            eX=Math.min(Math.ceil((this._cam.x+this._cam.w)/tile), this._size.w),
-            sY=Math.max(Math.floor(this._cam.y/tile), 0),
-            eY=Math.min(Math.ceil((this._cam.y+this._cam.h)/tile), this._size.h);
+            sX=Math.max(Math.floor(this._cam.x/this._tile), 0), 
+            eX=Math.min(Math.ceil((this._cam.x+this._cam.w)/this._tile), this._size.w),
+            sY=Math.max(Math.floor(this._cam.y/this._tile), 0),
+            eY=Math.min(Math.ceil((this._cam.y+this._cam.h)/this._tile), this._size.h);
 
         for(let x=sX; x<eX; x++){
             for(let y=sY; y<eY; y++){
@@ -96,17 +110,17 @@ export class Render{
 
                 this.#engine.setFliiColor(floor.bg);
                 this.#engine.fillRect(
-                    x*tile,
-                    y*tile,
-                    tile,
-                    tile
+                    x*this._tile,
+                    y*this._tile,
+                    this._tile,
+                    this._tile
                 );
 
                 if(this._blocks[i]=='0' || block.style.hidden)continue;
                 this.#engine.setFliiColor(block.style.bg);
                 this.#engine.fillRect(
-                    x*tile+block.logic.x,
-                    y*tile+block.logic.y,
+                    x*this._tile+block.logic.x,
+                    y*this._tile+block.logic.y,
                     block.logic.w,
                     block.logic.h
                 );
@@ -275,9 +289,6 @@ function resizeCanvas(){
     gl.viewport(0, 0, canvas.width, canvas.height);
     canvas.style.width=canvas.width+"px";
     canvas.style.height=canvas.height+"px";
-
-    scale.w=canvas.width/(tile*8);
-    scale.h=canvas.height/(tile*4);
 
     glScale.w=2/canvas.width;
     glScale.h=2/canvas.height;
