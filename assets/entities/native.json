@@ -4,8 +4,8 @@
         "style":{ "bg":"255,0,0" },
         "logic":{
             "solid":true,
-            "w":80, "h":100,
-            "v": 5,
+            "w":30, "h":32,
+            "v": 2,
             "healt":100,
             "canHit": true
         },
