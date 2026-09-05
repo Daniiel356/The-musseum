@@ -16,6 +16,7 @@ class World{
 
     friction=8;
     frec=1000/50;
+    _tile=32;
 
     getEntities(){ return this.#entityManager._entities }
     findEntity(id){ return this.#entityManager.find(id) }
@@ -46,6 +47,7 @@ class World{
             throw new Error("Error al cargar el mundo.\n"+entityInfo.warn.map(e=>e+"\n"));
         }
         context.world.size=this._size;
+        this.#entityManager._tile=this._tile;
     }
 
     update(){
@@ -92,7 +94,7 @@ class World{
             }
         });
 
-        const pId=this.#entityManager.summon("player", x*100, y*100);
+        const pId=this.#entityManager.summon("player", x*this._tile, y*this._tile);
         const p=this.#entityManager.find(pId);
         p.tags.role=role;
 
