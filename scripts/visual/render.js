@@ -5,6 +5,7 @@ gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 gl.clearColor(0, 0, 0, 0.005);
 let scale={w:1, h:1};
 let glScale={w: 0, h:0, rw:0, rh:0};
+const tile=100;
 
 export class Render{
     #engine=new RenderEngine();
@@ -59,8 +60,8 @@ export class Render{
         const p=this._entities.find(e=>e.id==this._playerId);
         if(!p)return;
 
-        const maxX=Math.max(0,this._size.w*100-w);
-        const maxY=Math.max(0,this._size.h*100-h);
+        const maxX=Math.max(0,this._size.w*tile-w);
+        const maxY=Math.max(0,this._size.h*tile-h);
 
         this._cam.x=Math.min(
             Math.max(0,(p.x+p.w/2)-w/2),
@@ -81,10 +82,10 @@ export class Render{
     }
     #renderWorld(){
         const 
-            sX=Math.max(Math.floor(this._cam.x/100), 0), 
-            eX=Math.min(Math.ceil((this._cam.x+this._cam.w)/100), this._size.w),
-            sY=Math.max(Math.floor(this._cam.y/100), 0),
-            eY=Math.min(Math.ceil((this._cam.y+this._cam.h)/100), this._size.h);
+            sX=Math.max(Math.floor(this._cam.x/tile), 0), 
+            eX=Math.min(Math.ceil((this._cam.x+this._cam.w)/tile), this._size.w),
+            sY=Math.max(Math.floor(this._cam.y/tile), 0),
+            eY=Math.min(Math.ceil((this._cam.y+this._cam.h)/tile), this._size.h);
 
         for(let x=sX; x<eX; x++){
             for(let y=sY; y<eY; y++){
@@ -95,17 +96,17 @@ export class Render{
 
                 this.#engine.setFliiColor(floor.bg);
                 this.#engine.fillRect(
-                    x*100,
-                    y*100,
-                    100,
-                    100
+                    x*tile,
+                    y*tile,
+                    tile,
+                    tile
                 );
 
                 if(this._blocks[i]=='0' || block.style.hidden)continue;
                 this.#engine.setFliiColor(block.style.bg);
                 this.#engine.fillRect(
-                    x*100+block.logic.x,
-                    y*100+block.logic.y,
+                    x*tile+block.logic.x,
+                    y*tile+block.logic.y,
                     block.logic.w,
                     block.logic.h
                 );
@@ -275,8 +276,8 @@ function resizeCanvas(){
     canvas.style.width=canvas.width+"px";
     canvas.style.height=canvas.height+"px";
 
-    scale.w=canvas.width/800;
-    scale.h=canvas.height/400;
+    scale.w=canvas.width/(tile*8);
+    scale.h=canvas.height/(tile*4);
 
     glScale.w=2/canvas.width;
     glScale.h=2/canvas.height;
