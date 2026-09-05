@@ -1,6 +1,7 @@
 import { Connection } from "../connection/conection.js";
 import { Render } from "../visual/render.js";
 import { World, loadWorld } from "./world/world.js";
+import { context } from "./world/utils.js";
 
 export class Game{
     #conection=new Connection();
@@ -15,6 +16,7 @@ export class Game{
     get playerId(){ return this.#playerId; }
     #lastTime=-1;
     #count=0;
+    _tile=32;
     #actControls=()=>{};
 
     constructor(){
@@ -26,11 +28,14 @@ export class Game{
     async init(world){
         if(this._isHost){
             this.#world=new World(await loadWorld(world));
+            this.#world._tile=this._tile;
             await this.#world.init();
             this.#playerId=await this.#world.spawnPlayer();
         }
         await this.#render.init();
         this.#render._size=this.#world._size;
+        this.#render._tile=this._tile;
+        context.tile=this._tile;
         this.update();
         this.start();
     }
