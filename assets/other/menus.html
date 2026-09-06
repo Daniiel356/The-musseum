@@ -82,10 +82,10 @@
                 dx=dx/dist*r;
                 dy=dy/dist*r;
             }
-            window.game.engine.input={
+            window.game.engine.input({
                 x: dx<0? -0.4+Math.min(-0.6, dx/r): 0.4+Math.max(0.6, dx/r),
                 y: dy<0? -0.4+Math.min(-0.6, dy/r): 0.4+Math.max(0.6, dy/r)
-            };
+            });
             stick.style.transform =`translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
         }
         function end(e){
