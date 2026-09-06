@@ -4,25 +4,32 @@ import { World, loadWorld } from "./world/world.js";
 import { context } from "./world/utils.js";
 
 export class Game{
-    #conection=new Connection();
+    #players={};
+    #conection=new Connection({
+        setInput: (id, x)=>{
+            this.#world.actEntity(this.#players[id+""], (e)=>e.input=x);
+            console.log(x)
+        }
+    });
     #render=new Render();
     #world;
     #inloop=false;
     _isHost=false;
     _connectionState=0;//0: desconectado, 1: tratando de conectar, 2: conectado, 3: desconectado (por error)
     #playerId=-1;
+    #connId=-1;
     #habilities=[];
-    set playerId(v){this.#playerId=v; this.#render._playerId=v; }
+    set playerId(v){ this.#playerId=v; this.#render._playerId=v; }
     get playerId(){ return this.#playerId; }
     #lastTime=-1;
     #count=0;
     _tile=32;
-    #actControls=()=>{};
 
     constructor(){
         this.#conection.on=(event, v)=>{
             this._isHost=v.host;
         };
+        window.game.engine.input=(x)=>this.#actControls(x);
     }
 
     async init(world){
@@ -31,8 +38,19 @@ export class Game{
             this.#world._tile=this._tile;
             await this.#world.init();
             this.#playerId=await this.#world.spawnPlayer();
+            if(this.#connId==-1){
+                let id=0;
+                for(let key of Object.keys(this.#players)){
+                    if(id+""!=key)return;
+                    id++;
+                };
+                this.#connId=id;
+                this.#players[id+""]=this.#playerId;
+            }
         }
+        
         await this.#render.init();
+        
         this.#render._size=this.#world._size;
         this.#render._tile=this._tile;
         context.tile=this._tile;
@@ -40,12 +58,14 @@ export class Game{
         this.start();
     }
 
+    #actControls(input){
+        this.#conection.postInput(this.#connId, input);
+    }
     update(){
         if(this._isHost){
             this.loop=(t)=>{
                 this.#count+=(t-this.#lastTime);
                 this.#lastTime=t;
-                this.#actControls();
 
                 while(this.#count>=this.#world.frec){
                     this.#world.update();
@@ -56,15 +76,8 @@ export class Game{
 
                 requestAnimationFrame((x)=>this.loop(x));
             };
-
-            this.#actControls=()=>{
-                this.#world.actEntity(this.#playerId, e=>{
-                    e.input=window.game.engine.input;
-                });
-            };
-        }
+        };
         window.game.clickEvent=(x, y)=>this.#clickEvent(x, y);
-        this.#habilities=this.#conection.request("habilities", this.#playerId);
 
         this.#render._blocks=this.#world.cont;
         this.#render._blocksSource=this.#world.blocksData;
@@ -78,11 +91,13 @@ export class Game{
         this.#conection._host=true;
         this._isHost=true;
     }
+    
     async initMultiPlayer(){
         if(window.isLoading){
             try{
-                await this.#conection.connectToServer();
+                [this.#connId, this._isHost]=await this.#conection.connectToServer();
                 console.log("Conectado con exito");
+                console.log(`id: ${this.#connId}, isHost: ${this._isHost}`);
             }catch(err){
                 console.error("Error al conectar", err);
             }
