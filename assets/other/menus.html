@@ -50,7 +50,24 @@
         let r=rect.width/2;
 
         let touchId=-1;
+        let opacity=0.25;
+        let state=0;
 
+        function hide(){
+            if(state==0 && opacity>0.5){
+                opacity-=0.05;
+                joy.style.opacity=opacity+'';
+                requestAnimationFrame(hide);
+            }
+        }
+        function show(){
+            if(state==1 && opacity<1){
+                opacity+=0.05;
+                joy.style.opacity=opacity+'';
+                requestAnimationFrame(show);
+            }
+        }
+        
         function move(e){
             if(e.pointerId!=touchId)return;
             const x=e.pageX;
@@ -80,11 +97,15 @@
             window.game.engine.input={x:0, y:0};
             stick.style.transform =`translate(-50%, -50%)`;
             touchId=-1;
+            state=0;
+            hide();
         }
 
         function start(e){
             touchId=e.pointerId;
             e.target.setPointerCapture(e.pointerId);
+            state=1;
+            show();
         }
 
         joy.addEventListener("pointerdown", start);
