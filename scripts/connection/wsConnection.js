@@ -4,30 +4,34 @@ export class Conn {
     get state(){return this.#ws?.readyState || -1};
 
     async init(){
-        this.#ws=new WebSocket("wss://testserver-h5lx.onrender.com");
-        let resolve=()=>{
-            console.log("Ejem...");
-        };
-        let reject=()=>{
-            console.error("Error de conexion");
-        }
-
-        this.#ws.onopen=()=>{
-            resolve();
-        };
-
-        this.#ws.onmessage=(msg)=>{
-            this.out(msg);
-        };
-
-        this.#ws.onerror=(err)=>{
-            reject(err);
-        };
         return new Promise((res, rej)=>{
-            resolve=res;
-            reject=rej;
+            let intents=10;
+            let error;
+
+            while(intents>0){
+                this.#ws=new WebSocket("wss://testserver-h5lx.onrender.com");
+        
+                this.#ws.onopen=()=>{
+                    break;
+                };
+    
+                this.#ws.onerror=(err)=>{
+                    intents--;
+                    error=err;
+                    continue;
+                };
+            }
+            if(intents==0){
+                rej(error);
+            }
+            
+            this.#ws.onmessage=(msg)=>{
+                this.out(msg);
+            };
+            res();
         });
     }
+    
     send(msg){
         this.#ws.send(msg);
     }
