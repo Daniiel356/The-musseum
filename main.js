@@ -2,7 +2,6 @@ import { setScene, scenes } from "./scripts/visual/scenes.js";
 import { Game } from "./scripts/engine/game.js";
 import { initTutorial } from "./scripts/engine/tutorial.js";
 
-const game=new Game();
 
 //window vars support
 window.isLoading=false;
@@ -10,7 +9,7 @@ window.setScene=setScene;
 window.scenes=scenes;
 window.game={
     engine: {
-        input:{x:0, y:0}        
+        input:(x)=>{}     
     },
     visual: {
         setScene: setScene,
@@ -28,6 +27,7 @@ window.initMultiplayer=async ()=>{
     setScene(scenes.LOAD_SCREEN)
     await game.initMultiPlayer();
 };
+
 
 //PC support
 const keys={};
