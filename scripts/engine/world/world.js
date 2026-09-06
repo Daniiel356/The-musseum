@@ -97,6 +97,7 @@ class World{
         const pId=this.#entityManager.summon("player", x*this._tile, y*this._tile);
         const p=this.#entityManager.find(pId);
         p.tags.role=role;
+        p.input={x:0,y:0};
 
         console.log("Jugador con la ID", pId, "generada");
         return pId;
