@@ -52,6 +52,7 @@ canvas{
     border-radius: 50%; border: solid rgba(255,255,255,0.2) 2px;
     background: rgba(20,20,20,0.65);
     display: var(--mobile);
+    opacity: 0.25;
 }
 #stick{
     position: absolute;
