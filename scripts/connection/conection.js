@@ -56,5 +56,11 @@ export class Connection{
 
     #onMsg(e){
         const msg=JSON.parse(e.data);
+        if(msg.player_join && this._host){
+            console.log("jugador con la id "+msg.player_join+" conectado")
+        }
+        if(msg.player_left && this._host){
+            console.log("jugador con la id "+msg.player_left+" desconectado")
+        }
     }
 }
