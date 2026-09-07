@@ -17,14 +17,18 @@ export class Connection{
 
     async connectToServer(){
         console.log("Conectando al server...");
-        return new Promise((res, rej)=>{
+        return new Promise(async (res, rej)=>{
             try{
                 await this.#conn.init();
                 console.log("Conectado con exito!, esperando primer mensaje..");
+                
                 const data=await new Promise((res, rej)=>{
-                    setTimeout(()=>this._id!=-1&&rej("Id Timeout exception"), 5000);
-                    #this.#conn.out=(e)=>{
-                        const msg=JSON.parse(msg);
+                    setTimeout(()=>{
+                        this._id!=-1&&rej("Id Timeout exception");
+                    }, 5000);
+                    
+                    this.#conn.out=(e)=>{
+                        const msg=JSON.parse(e.data);
                         if(msg.first){
                             res([msg.id, msg.host]);
                         }
