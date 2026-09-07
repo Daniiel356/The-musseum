@@ -89,13 +89,11 @@
             stick.style.transform =`translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
         }
         function end(e){
-            if(touchId==-1||e.pointerId!=touchId){
-                alert("1");return;}
+            if(touchId==-1||e.pointerId!=touchId)return;
+
             try {
                 e.target.releasePointerCapture(e.pointerId);
-            } catch(err) {
-                alert("2")
-            }
+            } catch(err) {}
             stick.style.transform =`translate(-50%, -50%)`;
             touchId=-1;
             state=0;
