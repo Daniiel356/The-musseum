@@ -41,7 +41,7 @@ export class Game{
             if(this.#connId==-1){
                 let id=0;
                 for(let key of Object.keys(this.#players)){
-                    if(id+""!=key)break;
+                    if(id+""!=key) break;
                     id++;
                 };
                 this.#connId=id;
