@@ -12,7 +12,7 @@ try{
     const documentoClonado=parser.parseFromString(textoHTML, 'text/html');
     doc=documentoClonado;
 }catch(error){
-    console.error('Hubo un problema:', error.message);
+    console.error('Hubo un problema:', error);
 }
 
 const scenes={
