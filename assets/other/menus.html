@@ -89,16 +89,18 @@
             stick.style.transform =`translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
         }
         function end(e){
-            if(touchId==-1||e.pointerId!=touchId)return;
+            if(touchId==-1||e.pointerId!=touchId){
+                alert("1");return;}
             try {
                 e.target.releasePointerCapture(e.pointerId);
-            } catch(err) {}
-
-            window.game.engine.input={x:0, y:0};
+            } catch(err) {
+                alert("2")
+            }
             stick.style.transform =`translate(-50%, -50%)`;
             touchId=-1;
             state=0;
             hide();
+            window.game.engine.input({x:0,y:0});
         }
 
         function start(e){
