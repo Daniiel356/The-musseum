@@ -53,7 +53,7 @@ export class Connection{
         this._state=this.#conn.state;
         this.#conn.out=(e)=>(this._host?this.#onMsgHost:this.#onMsgClient)(e);
         if(this._host){
-            setInterval(#conn.send("{'hola':true}"))
+            setInterval(()=>this.#conn.send("{'hola':true}"), 2000);
         }
     }
 
@@ -66,8 +66,9 @@ export class Connection{
             console.log("jugador con la id "+msg.id+" desconectado")
         }
     }
+    
     #onMsgClient(e){
         const msg=JSON.parse(e.data);
-        alert(msg)
+        alert(msg);
     }
 }
