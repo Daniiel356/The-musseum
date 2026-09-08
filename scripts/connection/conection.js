@@ -52,6 +52,9 @@ export class Connection{
     #update(){
         this._state=this.#conn.state;
         this.#conn.out=(e)=>(this._host?this.#onMsgHost:this.#onMsgClient)(e);
+        if(this._host){
+            setInterval(#conn.send("{'hola':true}"))
+        }
     }
 
     #onMsgHost(e){
