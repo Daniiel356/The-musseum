@@ -51,7 +51,8 @@ export class Connection{
 
     #update(){
         this._state=this.#conn.state;
-        this.#conn.out=(e)=>(this._host?this.#onMsgHost:this.#onMsgClient)(e);
+        const fun=this._host? this.#onMsgHost : this.#onMsgClient;
+        this.#conn.out=(e)=>fun(e);
         if(this._host){
             setInterval(()=>this.#conn.send("{'hola':true}"), 2000);
         }
