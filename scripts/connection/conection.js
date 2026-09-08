@@ -36,7 +36,6 @@ export class Connection{
                 });
                 this._id=data[0];
                 this._host=data[1];
-                this.#conn.out=(e)=>this.#onMsg(e);
                 this.#update();
                 res(data);
             }catch(err){
@@ -52,9 +51,10 @@ export class Connection{
 
     #update(){
         this._state=this.#conn.state;
+        this.#conn.out=(e)=>(this._host?this.#onMsgHost:this.#onMsgClient)(e);
     }
 
-    #onMsg(e){
+    #onMsgHost(e){
         const msg=JSON.parse(e.data);
         if(msg.type=="player_join" && this._host){
             console.log("jugador con la id "+msg.id+" conectado")
@@ -62,5 +62,9 @@ export class Connection{
         if(msg.type=="player_left" && this._host){
             console.log("jugador con la id "+msg.id+" desconectado")
         }
+    }
+    #onMsgClient(e){
+        const msg=JSON.parse(e.data);
+        alert(msg)
     }
 }
