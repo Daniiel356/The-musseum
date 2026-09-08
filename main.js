@@ -27,7 +27,7 @@ window.initMultiplayer=async ()=>{
     const game=new Game();
     setScene(scenes.LOAD_SCREEN)
     
-    await game.initMultiPlayer();
+    await game.initMultiPlayer("test"); //test
 };
 
 
