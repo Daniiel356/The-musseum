@@ -1,6 +1,8 @@
 let doc;
 const cont=document.getElementById("ui");
-const c=document.querySelector("canvas");
+const vStyle=document.createElement("style");
+document.querySelector("head").appendChild(vStyle);
+
 try{
     const respuesta=await fetch("./assets/other/menus.html");
     if(!respuesta.ok){
@@ -19,6 +21,7 @@ const scenes={
     MENU: "main",
     PLAY_MENU: "initialPlay",
     LOAD_SCREEN: "loadSetting",
+    GAME_MENU: "selectGame",
     GAME: "game"
 };
 
@@ -34,6 +37,7 @@ async function setScene(scene){
     const clon=document.importNode(template.content, true);
 
     const script=clon.querySelector('script');
+    const style=clon.querySelector("style");
     if(script){
         const newScript=document.createElement('script');
         newScript.textContent=script.textContent;
@@ -41,6 +45,7 @@ async function setScene(scene){
     }
 
     cont.appendChild(clon);
+    vStyle.textContent=style.textContent;
 }
 
 export {setScene, scenes}
