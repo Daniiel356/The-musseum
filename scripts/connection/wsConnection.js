@@ -11,6 +11,7 @@ export class Conn{
         let error;
 
         while(intents>0){
+            console.log("Intentando conectarse al server...")
             try{
                 await new Promise((res, rej)=>{
                     this.#ws=new WebSocket(
