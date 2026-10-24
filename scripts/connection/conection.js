@@ -21,9 +21,9 @@ export class Connection{
             try{
                 await this.#conn.init();
                 console.log("Conectado con exito!, esperando primer mensaje..");
-                const data=await new Promise((res, rej)=>{
+                const data=await new Promise(async(res, rej)=>{
                     setTimeout(()=>this._id!=-1&&rej("Id Timeout exception"), 5000);
-                    #this.#conn.out=(e)=>{
+                    this.#conn.out=(e)=>{
                         const msg=JSON.parse(msg);
                         if(msg.first){
                             res([msg.id, msg.host]);
