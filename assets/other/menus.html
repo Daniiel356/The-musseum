@@ -16,10 +16,14 @@
         document.body.style.background="#000";
         let p=0;
         const x=document.getElementById("x");
+        const data=document.getElementById("loadData");
+        
+        data.textContent=window.loadSubtitle;
         const interv=()=>{
             if(!x)return;
             p=p<3?p+1:0;
             x.textContent=".".repeat(p);
+            data.textContent=window.loadSubtitle;
             setTimeout(()=>interv(), 650)
         }
         setTimeout(()=>interv(), 650);
