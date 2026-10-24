@@ -24,7 +24,7 @@ export class Connection{
                 const data=await new Promise((res, rej)=>{
                     setTimeout(()=>this._id!=-1&&rej("Id Timeout exception"), 5000);
                     this.#conn.out=(e)=>{
-                        const msg=JSON.parse(msg);
+                        const msg=JSON.parse(e.data);
                         if(msg.first){
                             res([msg.id, msg.host]);
                         }
@@ -41,9 +41,12 @@ export class Connection{
         });
     }
 
-    postInput(id, input){
-        console.log("redireccionando input")
-        this.#context.setInput(id, input);
+    simuleHost(){
+        this._state=-2;
+    }
+
+    postInput(input){
+        if(this._state==-2||this._host)this.#context.setInput(this._id, input);
     }
 
     #update(){
@@ -52,5 +55,6 @@ export class Connection{
 
     #onMsg(e){
         const msg=JSON.parse(e.data);
+        console.log(msg)
     }
 }
