@@ -184,19 +184,20 @@
         
         #worlds {
             display: grid;
-            grid-auto-rows: 27%;
+            grid-auto-rows: auto;
         
             overflow-y: auto;
             min-height: 0;
         }
         
         .elem {
+            height: max-content;
             box-sizing: border-box;
             padding: 12px;
             border-bottom: 1px solid #555;
-            font-size: 20px;
             & span{
-                font-size: 18px;
+                font-weight: bolder;
+                color: red;
             }
         }
     </style>
@@ -204,8 +205,8 @@
         const div=document.getElementById("worlds");
         window.game.media.worlds.forEach(world=>{
             const elem=document.createElement("button");
-            elem.class="elem";
-            elem.innerHTML=`${world.label}<br><span>${world.type}</span>`;
+            elem.className="elem";
+            elem.innerHTML=`<h2>${world.label}</h2><p>${world.despription}</p>`;
             elem.onclick=()=>window.game.engine.setWorld(world.src);
             div.appendChild(elem);
         });
