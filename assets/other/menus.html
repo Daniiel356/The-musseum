@@ -164,9 +164,12 @@
     </script>
 </template>
 <template id="selectGame">
-    <div id="worlds"></div>
+    <div id="panel">
+        <h2>Selecciona el mapa</h2>
+        <div id="worlds"></div>
+    </div>
     <style>
-        #worlds{
+        #panel{
             position: absolute;
             left: 5%; top: 5%;
             width: 90%; height: 80%;
@@ -176,14 +179,25 @@
             box-sizing: border-box;
             padding: 10px;
             display: grid;
-            gap: 5px;
+            grid-template-rows: auto minmax(0, 1fr);
         }
-        .elem{
-            position: relative; display: flex;
-            width: 100%; height: 100%;
-            border: solid black 2px;
+        
+        #worlds {
+            display: grid;
+            grid-auto-rows: 27%;
+        
+            overflow-y: auto;
+            min-height: 0;
+        }
+        
+        .elem {
             box-sizing: border-box;
-            text-align: center;
+            padding: 12px;
+            border-bottom: 1px solid #555;
+            font-size: 20px;
+            & span{
+                font-size: 18px;
+            }
         }
     </style>
     <script>
@@ -191,7 +205,7 @@
         window.game.media.worlds.forEach(world=>{
             const elem=document.createElement("button");
             elem.class="elem";
-            elem.textContent=world.label;
+            elem.innerHTML=`${world.label}<br><span>${world.type}</span>`;
             elem.onclick=()=>window.game.engine.setWorld(world.src);
             div.appendChild(elem);
         });
