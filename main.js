@@ -33,7 +33,8 @@ window.initMultiplayer=async ()=>{
     if(h){
         setScene(scenes.GAME_MENU);
         const world=await new Promise((res)=>window.game.engine.setWorld=res);
-        window.loadSubtitle="Cargando Mundo"
+        window.loadSubtitle="Cargando Mundo";
+        setScene(scenes.LOAD_SCREEN);
         await game.init(world);
         setScene(scenes.GAME)
     }
