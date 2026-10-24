@@ -3,5 +3,25 @@
         "label": "Tutorial",
         "type": "tutorial",
         "src": "test"
+    },
+    {
+        "label": "Museo",
+        "type": "tutorial",
+        "src": "test"
+    },
+    {
+        "label": "Cuevas",
+        "type": "tutorial",
+        "src": "test"
+    },
+    {
+        "label": "Hospital",
+        "type": "tutorial",
+        "src": "test"
+    },
+    {
+        "label": "Ajua",
+        "type": "tutorial",
+        "src": "test"
     }
 ]
