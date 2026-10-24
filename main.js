@@ -2,7 +2,6 @@ import { setScene, scenes } from "./scripts/visual/scenes.js";
 import { Game } from "./scripts/engine/game.js";
 import { initTutorial } from "./scripts/engine/tutorial.js";
 
-
 //window vars support
 window.isLoading=false;
 window.setScene=setScene;
@@ -24,8 +23,13 @@ window.initTutorial=async ()=>{
 };
 
 window.initMultiplayer=async ()=>{
-    setScene(scenes.LOAD_SCREEN)
+    const game=new Game();
+    window.loadSubtitle="Conectando al servidor";
+    setScene(scenes.LOAD_SCREEN);
     await game.initMultiPlayer();
+    window.loadSubtitle="Cargando Mundo"
+    await game.init("test");
+    setScene(scenes.GAME)
 };
 
 
