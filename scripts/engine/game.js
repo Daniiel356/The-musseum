@@ -4,11 +4,10 @@ import { World, loadWorld } from "./world/world.js";
 import { context } from "./world/utils.js";
 
 export class Game{
-    #players={};
+    #playersConnId={};
     #conection=new Connection({
         setInput: (id, x)=>{
-            this.#world.actEntity(this.#players[id+""], (e)=>e.input=x);
-            console.log(x)
+            this.#world.actEntity(this.#playersConnId[id+""], (e)=>e.input=x);
         }
     });
     #render=new Render();
@@ -32,21 +31,20 @@ export class Game{
         window.game.engine.input=(x)=>this.#actControls(x);
     }
 
-    async init(world){
+    async init(world, tutorial=false){
+        if(tutorial){
+            this.#conection.simuleHost();
+            this._connectionState=-2;
+            this.#connId=0;
+            this._isHost=true;
+        }
+        
         if(this._isHost){
             this.#world=new World(await loadWorld(world));
             this.#world._tile=this._tile;
             await this.#world.init();
             this.#playerId=await this.#world.spawnPlayer();
-            if(this.#connId==-1){
-                let id=0;
-                for(let key of Object.keys(this.#players)){
-                    if(id+""!=key) break;
-                    id++;
-                };
-                this.#connId=id;
-                this.#players[id+""]=this.#playerId;
-            }
+            this.#playersConnId[this.#connId+""]=this.playerId;
         }
         
         await this.#render.init();
@@ -59,7 +57,7 @@ export class Game{
     }
 
     #actControls(input){
-        this.#conection.postInput(this.#connId, input);
+        this.#conection.postInput(input);
     }
     update(){
         if(this._isHost){
@@ -86,19 +84,20 @@ export class Game{
         this.#render._entities=this.#world.getEntities();
         this.#render._playerId=this.#playerId;
     }
-
-    setHost(){
-        this.#conection._host=true;
-        this._isHost=true;
-    }
     
     async initMultiPlayer(){
         if(window.isLoading){
             try{
+                this._connectionState=1;
                 [this.#connId, this._isHost]=await this.#conection.connectToServer();
+                this._connectionState=2;
+                
+                
                 console.log("Conectado con exito");
                 console.log(`id: ${this.#connId}, isHost: ${this._isHost}`);
+                return this._isHost;
             }catch(err){
+                this._connectionState=3;
                 console.error("Error al conectar", err);
             }
         }
