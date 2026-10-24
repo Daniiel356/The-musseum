@@ -13,6 +13,9 @@ window.game={
     visual: {
         setScene: setScene,
         scenes
+    },
+    media: {
+        worlds: await(await fetch("./assets/worlds/dictionary.json")).json()
     }
 };
 
@@ -26,10 +29,14 @@ window.initMultiplayer=async ()=>{
     const game=new Game();
     window.loadSubtitle="Conectando al servidor";
     setScene(scenes.LOAD_SCREEN);
-    await game.initMultiPlayer();
-    window.loadSubtitle="Cargando Mundo"
-    await game.init("test");
-    setScene(scenes.GAME)
+    const h=await game.initMultiPlayer();
+    if(h){
+        setScene(scenes.GAME_MENU);
+        const world=await new Promise((res)=>window.game.engine.setWorld=res);
+        window.loadSubtitle="Cargando Mundo"
+        await game.init(world);
+        setScene(scenes.GAME)
+    }
 };
 
 
@@ -71,4 +78,4 @@ document.addEventListener("keyup", (e)=>{
 if(!isMobile)PCMode();
 document.addEventListener("keypress", PCMode, {once: true});
 
-await setScene(scenes.MENU); //Init
+await setScene(scenes.GAME_MENU); //Init
