@@ -160,7 +160,40 @@
         window.addEventListener("resize", ()=>{
             bodyW=document.body.clientWidth;
             bodyH=document.body.clientHeight;
-
+        });
+    </script>
+</template>
+<template id="selectGame">
+    <div id="worlds"></div>
+    <style>
+        #worlds{
+            position: absolute;
+            left: 5%; top: 5%;
+            width: 90%; height: 80%;
+            background: #eee;
+            border: solid black 3px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            padding: 10px;
+            display: grid;
+            gap: 5px;
+        }
+        .elem{
+            position: relative; display: flex;
+            width: 100%; height: 100%;
+            border: solid black 2px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+    </style>
+    <script>
+        const div=document.getElementById("worlds");
+        window.game.media.worlds.forEach(world=>{
+            const elem=document.createElement("button");
+            elem.class="elem";
+            elem.textContent=world.label;
+            elem.onclick=()=>window.game.engine.setWorld(world.src);
+            div.appendChild(elem);
         });
     </script>
 </template>
