@@ -43,6 +43,7 @@ export class Connection{
 
     simuleHost(){
         this._state=-2;
+        this._id=0;
     }
 
     postInput(input){
