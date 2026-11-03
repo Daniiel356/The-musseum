@@ -1,5 +1,5 @@
 import { EntityManager } from "./entity.js";
-import { ContentManager } from "./blocks.js";
+import { ContentManager } from "./content.js";
 import { context } from "./utils.js"
 
 class World{
@@ -57,8 +57,9 @@ class World{
     playerEvent(event){
         const p=this.#entityManager.find(event.id);
         const data=event.data;
-        console.log(p)
-        if(event.type="click"){
+        console.log(p);
+        
+        if(event.type=="click"){
             console.log(p.input.hability)
             if(p.input.hability!=-1)return;
             console.log("interac")
