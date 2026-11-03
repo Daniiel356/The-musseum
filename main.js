@@ -79,4 +79,5 @@ document.addEventListener("keyup", (e)=>{
 if(!isMobile)PCMode();
 document.addEventListener("keypress", PCMode, {once: true});
 
-await setScene(scenes.GAME_MENU); //Init
+await setScene(scenes.LOAD_SCREEN); //Init
+await initTutorial();
