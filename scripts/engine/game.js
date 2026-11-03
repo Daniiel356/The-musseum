@@ -10,6 +10,7 @@ export class Game{
             this.#world.actEntity(this.#playersConnId[id+""], (e)=>e.input=x);
         }
     });
+    
     #render=new Render();
     #world;
     #inloop=false;
