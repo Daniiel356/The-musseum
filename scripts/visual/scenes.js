@@ -45,7 +45,7 @@ async function setScene(scene){
     }
 
     cont.appendChild(clon);
-    vStyle.textContent=style.textContent;
+    if(style)vStyle.textContent=style.textContent;
 }
 
 export {setScene, scenes}
